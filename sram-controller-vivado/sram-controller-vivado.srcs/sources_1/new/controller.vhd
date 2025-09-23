@@ -45,6 +45,8 @@ entity controller is
         Read      : in    std_logic;
         Write     : in    std_logic;
         U_address : in    std_logic_vector(addr_bits - 1 downto 0);
+        Reset     : in    std_logic;
+        Clock     : in    std_logic;
         
         
         -- external SRAM side
@@ -70,12 +72,68 @@ end controller;
 
 architecture Behavioral of controller is
 
-
-
-
-
-
+    type t_state is (S_RESET, S_IDLE, S_READ_SRAM_NO_BURST, S_WRITE_SRAM_NO_BURST);
+    signal state: t_state;
 
 begin
 
+    switch_between_states: process(Clock, Reset)
+    begin
+        if (Reset = '1') then
+            state <= S_RESET;
+        else
+            if ((clock'event) and (clock = '1')) then
+                case state is
+                    when S_RESET =>
+                        state <= S_IDLE;
+                    when S_IDLE =>
+                        if (Read = '1') then
+                            state <= S_READ_SRAM_NO_BURST;
+                        elsif (Write = '1') then
+                            state <= S_WRITE_SRAM_NO_BURST;
+                        else
+                            state <= S_IDLE;
+                        end if;
+                    when S_READ_SRAM_NO_BURST =>
+                        if (Read = '1') then
+                            state <= S_READ_SRAM_NO_BURST;
+                        elsif (Write = '1') then
+                            state <= S_WRITE_SRAM_NO_BURST;
+                        else
+                            state <= S_IDLE;
+                        end if;
+                    when S_WRITE_SRAM_NO_BURST =>
+                        if (Read = '1') then
+                            state <= S_READ_SRAM_NO_BURST;
+                        elsif (Write = '1') then
+                            state <= S_WRITE_SRAM_NO_BURST;
+                        else
+                            state <= S_IDLE;
+                        end if;
+                end case;
+            end if ;
+        end if;
+    end process;
+    
+    
+    sram_control: process(Clock)
+    begin
+        if ((clock'event) and (clock = '1')) then
+            case state is
+                when S_RESET =>
+                    -- TODO: set everything to "zero"
+                when S_IDLE =>
+                    -- TODO: set everything to "zero"
+                when S_READ_SRAM_NO_BURST =>
+                    -- pass address through
+                    -- put SRAM into read mode
+                    -- connect U_data_o to sram Data, put inout buffer into "in" mode
+                when S_WRITE_SRAM_NO_BURST =>
+                    -- pass address through
+                    -- put SRAM into write mode
+                    -- connect U_data_i through to sram Data, put inout buffer into "out" mode
+            end case;
+        end if;
+    end process;
+    
 end Behavioral;
