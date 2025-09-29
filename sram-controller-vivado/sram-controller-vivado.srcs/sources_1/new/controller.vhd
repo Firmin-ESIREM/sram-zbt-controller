@@ -1,11 +1,11 @@
 ----------------------------------------------------------------------------------
--- Company: 
--- Engineer: 
+-- Company: Polytech Dijon - Universite Bourgogne Europe
+-- Engineer: Firmin Launay <Firmin_Launay@etu.ube.fr>
 -- 
--- Create Date: 23.09.2025 14:08:59
--- Design Name: 
+-- Create Date: 23.09.2025
+-- Design Name: SRAM ZBT Controller - Vivado VHDL implementation
 -- Module Name: controller - Behavioral
--- Project Name: 
+-- Project Name: SRAM ZBT Controller
 -- Target Devices: 
 -- Tool Versions: 
 -- Description: 
@@ -13,7 +13,7 @@
 -- Dependencies: 
 -- 
 -- Revision:
--- Revision 0.01 - File Created
+-- 
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
@@ -34,7 +34,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 entity controller is
     
     port (
-        -- user side
+        -- user side --
         U_data_i  : in    std_logic_vector(35 downto 0);
         U_data_o  : out   std_logic_vector(35 downto 0);
         Read      : in    std_logic;
@@ -42,8 +42,9 @@ entity controller is
         U_address : in    std_logic_vector(1 downto 0);
         Reset     : in    std_logic;
         Clock     : in    std_logic;
+        ---------------
         
-        -- external SRAM side
+        -- external SRAM side --
         Data      : inout std_logic_vector (35 downto 0);              -- Data I/O
         Address   : out   std_logic_vector (18 downto 0);              -- Address
         Lbo_n     : out   std_logic;                                   -- Burst Mode
@@ -60,6 +61,7 @@ entity controller is
         Ce2_n     : out   std_logic;                                   -- CE2#
         Ce2       : out   std_logic;                                   -- CE2
         Zz        : out   std_logic                                    -- Snooze Mode
+        ------------------------
     );
 
 end controller;
@@ -70,7 +72,11 @@ architecture Behavioral of controller is
     signal state: t_state;
 
 begin
-    Clk <= Clock;  -- hardwire the clocks together
+
+    -- Hardwiring --
+    Clk <= Clock;
+    Address <= U_Address;
+    ----------------
 
     switch_between_states: process(Clock, Reset)
     begin
@@ -117,7 +123,6 @@ begin
             case state is
                 when S_RESET =>
                     Data <= (others => '0');
-                    Address <= (others => '0');
                     Lbo_n <= '0';
                     Cke_n <= '0';
                     Ld_n <= '0';
@@ -133,7 +138,6 @@ begin
                     Zz <= '1';
                 when S_IDLE =>
                     Data <= (others => '0');
-                    Address <= (others => '0');
                     Lbo_n <= '0';
                     Cke_n <= '0';
                     Ld_n <= '0';
@@ -148,11 +152,9 @@ begin
                     Ce2 <= '0';
                     Zz <= '1';
                 when S_READ_SRAM_NO_BURST =>
-                    -- pass address through
                     -- put SRAM into read mode
                     -- connect U_data_o to sram Data, put inout buffer into "in" mode
                 when S_WRITE_SRAM_NO_BURST =>
-                    -- pass address through
                     -- put SRAM into write mode
                     -- connect U_data_i through to sram Data, put inout buffer into "out" mode
             end case;
