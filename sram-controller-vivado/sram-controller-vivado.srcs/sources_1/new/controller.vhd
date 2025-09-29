@@ -32,26 +32,20 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use UNISIM.VComponents.all;
 
 entity controller is
-
-    generic (
-        addr_bits : integer := 19;
-        data_bits : integer := 36
-    );
     
     port (
         -- user side
-        U_data_i  : in    std_logic_vector(data_bits - 1 downto 0);
-        U_data_o  : out   std_logic_vector(data_bits - 1 downto 0);
+        U_data_i  : in    std_logic_vector(35 downto 0);
+        U_data_o  : out   std_logic_vector(35 downto 0);
         Read      : in    std_logic;
         Write     : in    std_logic;
-        U_address : in    std_logic_vector(addr_bits - 1 downto 0);
+        U_address : in    std_logic_vector(1 downto 0);
         Reset     : in    std_logic;
         Clock     : in    std_logic;
         
-        
         -- external SRAM side
-        Data      : inout std_logic_vector (data_bits - 1 downto 0);   -- Data I/O
-        Address   : out   std_logic_vector (addr_bits - 1 downto 0);   -- Address
+        Data      : inout std_logic_vector (35 downto 0);              -- Data I/O
+        Address   : out   std_logic_vector (18 downto 0);              -- Address
         Lbo_n     : out   std_logic;                                   -- Burst Mode
         Clk       : out   std_logic;                                   -- Clk
         Cke_n     : out   std_logic;                                   -- Cke#
@@ -76,6 +70,7 @@ architecture Behavioral of controller is
     signal state: t_state;
 
 begin
+    Clk <= Clock;  -- hardwire the clocks together
 
     switch_between_states: process(Clock, Reset)
     begin
@@ -121,9 +116,37 @@ begin
         if ((clock'event) and (clock = '1')) then
             case state is
                 when S_RESET =>
-                    -- TODO: set everything to "zero"
+                    Data <= (others => '0');
+                    Address <= (others => '0');
+                    Lbo_n <= '0';
+                    Cke_n <= '0';
+                    Ld_n <= '0';
+                    Bwa_n <= '0';
+                    Bwb_n <= '0';
+                    Bwc_n <= '0';
+                    Bwd_n <= '0';
+                    Rw_n <= '0';
+                    Oe_n <= '0';
+                    Ce_n <= '0';
+                    Ce2_n <= '0';
+                    Ce2 <= '0';
+                    Zz <= '1';
                 when S_IDLE =>
-                    -- TODO: set everything to "zero"
+                    Data <= (others => '0');
+                    Address <= (others => '0');
+                    Lbo_n <= '0';
+                    Cke_n <= '0';
+                    Ld_n <= '0';
+                    Bwa_n <= '0';
+                    Bwb_n <= '0';
+                    Bwc_n <= '0';
+                    Bwd_n <= '0';
+                    Rw_n <= '0';
+                    Oe_n <= '0';
+                    Ce_n <= '0';
+                    Ce2_n <= '0';
+                    Ce2 <= '0';
+                    Zz <= '1';
                 when S_READ_SRAM_NO_BURST =>
                     -- pass address through
                     -- put SRAM into read mode
