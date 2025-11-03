@@ -21,6 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use ieee.numeric_std.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -67,28 +68,28 @@ architecture Behavioral of tb1 is
             U_data_o  : out   std_logic_vector(35 downto 0);
             Read      : in    std_logic;
             Write     : in    std_logic;
-            U_address : in    std_logic_vector(1 downto 0);
+            U_address : in    std_logic_vector(18 downto 0);
             Reset     : in    std_logic;
             Clock     : in    std_logic;
             ---------------
         
             -- external SRAM side --
-            c_Data    : inout std_logic_vector (35 downto 0);  -- Data I/O
-            c_Address : out   std_logic_vector (18 downto 0);  -- Address
-            c_Lbo_n   : out   std_logic;                       -- Burst Mode
-            c_Clk     : out   std_logic;                       -- Clk
-            c_Cke_n   : out   std_logic;                       -- Cke#
-            c_Ld_n    : out   std_logic;                       -- Adv/Ld#
-            c_Bwa_n   : out   std_logic;                       -- Bwa#
-            c_Bwb_n   : out   std_logic;                       -- BWb#
-            c_Bwc_n   : out   std_logic;                       -- Bwc#
-            c_Bwd_n   : out   std_logic;                       -- BWd#
-            c_Rw_n    : out   std_logic;                       -- RW#
-            c_Oe_n    : out   std_logic;                       -- OE#
-            c_Ce_n    : out   std_logic;                       -- CE#
-            c_Ce2_n   : out   std_logic;                       -- CE2#
-            c_Ce2     : out   std_logic;                       -- CE2
-            c_Zz      : out   std_logic                        -- Snooze Mode
+            Data    : inout std_logic_vector (35 downto 0);  -- Data I/O
+            Address : out   std_logic_vector (18 downto 0);  -- Address
+            Lbo_n   : out   std_logic;                       -- Burst Mode
+            Clk     : out   std_logic;                       -- Clk
+            Cke_n   : out   std_logic;                       -- Cke#
+            Ld_n    : out   std_logic;                       -- Adv/Ld#
+            Bwa_n   : out   std_logic;                       -- Bwa#
+            Bwb_n   : out   std_logic;                       -- BWb#
+            Bwc_n   : out   std_logic;                       -- Bwc#
+            Bwd_n   : out   std_logic;                       -- BWd#
+            Rw_n    : out   std_logic;                       -- RW#
+            Oe_n    : out   std_logic;                       -- OE#
+            Ce_n    : out   std_logic;                       -- CE#
+            Ce2_n   : out   std_logic;                       -- CE2#
+            Ce2     : out   std_logic;                       -- CE2
+            Zz      : out   std_logic                        -- Snooze Mode
             ------------------------
         );
 
@@ -101,7 +102,7 @@ architecture Behavioral of tb1 is
     signal s_U_data_o  : std_logic_vector(35 downto 0);
     signal s_Read      : std_logic;
     signal s_Write     : std_logic;
-    signal s_U_address : std_logic_vector(1 downto 0);
+    signal s_U_address : std_logic_vector(18 downto 0);
     signal s_Reset     : std_logic;
     signal s_Clock     : std_logic;
     
@@ -135,22 +136,22 @@ architecture Behavioral of tb1 is
             Reset     => s_Reset,
             Clock     => s_Clock,
                     
-            c_Data    => s_Data,
-            c_Address => s_Address,
-            c_Lbo_n   => s_Lbo_n,
-            c_Clk     => s_Clk,
-            c_Cke_n   => s_Cke_n,
-            c_Ld_n    => s_Ld_n,
-            c_Bwa_n   => s_Bwa_n,
-            c_Bwb_n   => s_Bwb_n,
-            c_Bwc_n   => s_Bwc_n,
-            c_Bwd_n   => s_Bwd_n,
-            c_Rw_n    => s_Rw_n,
-            c_Oe_n    => s_Oe_n,
-            c_Ce_n    => s_Ce_n,
-            c_Ce2_n   => s_Ce2_n,
-            c_Ce2     => s_Ce2,
-            c_Zz      => s_Zz
+            Data    => s_Data,
+            Address => s_Address,
+            Lbo_n   => s_Lbo_n,
+            Clk     => s_Clk,
+            Cke_n   => s_Cke_n,
+            Ld_n    => s_Ld_n,
+            Bwa_n   => s_Bwa_n,
+            Bwb_n   => s_Bwb_n,
+            Bwc_n   => s_Bwc_n,
+            Bwd_n   => s_Bwd_n,
+            Rw_n    => s_Rw_n,
+            Oe_n    => s_Oe_n,
+            Ce_n    => s_Ce_n,
+            Ce2_n   => s_Ce2_n,
+            Ce2     => s_Ce2,
+            Zz      => s_Zz
         );
         
     mt55l512y36f_port_map: mt55l512y36f
@@ -173,5 +174,70 @@ architecture Behavioral of tb1 is
             Zz      => s_Zz
         );
 
+
+    clocking: process
+    begin
+        s_Clock <= '0'; 
+        wait for clock_period/2;
+        s_Clock <= clock_init;
+        wait for clock_period/2;
+    end process;
+    
+    
+    stimulus: process
+    begin
+        s_Reset <= '1';
+        wait for 50 ns;
+    
+    
+        s_U_data_i <= x"ABCDE1234";
+        s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
+        s_Read <= '0';
+        s_Write <= '1';
+        s_Reset <= '0';
+        
+        clock_init <= '1';
+        
+        wait for 2 * clock_period;
+        
+        s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
+        
+        wait for 2 * clock_period;
+        
+        s_Write <= '0';
+        s_Read <= '1';
+        s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
+        
+        wait for 2 * clock_period;
+        
+        s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
+        
+        wait for 2 * clock_period;
+        
+        s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
+        s_U_data_i <= x"001ACE42E";
+        s_Read <= '0';
+        s_Write <= '1';
+        
+        wait for 2 * clock_period;
+        
+        s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
+        
+        wait for 2 * clock_period;
+        
+        s_Write <= '0';
+        s_Read <= '1';
+        s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
+        
+        wait for 2 * clock_period;
+        
+        s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
+      
+        wait for 2 * clock_period;
+        
+        clock_init <= '0';
+        s_Reset <= '1';
+        
+    end process;
 
 end Behavioral;

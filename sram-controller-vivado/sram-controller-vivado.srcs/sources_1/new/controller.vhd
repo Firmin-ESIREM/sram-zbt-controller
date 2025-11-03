@@ -39,7 +39,7 @@ entity controller is
         U_data_o  : out   std_logic_vector(35 downto 0);
         Read      : in    std_logic;
         Write     : in    std_logic;
-        U_address : in    std_logic_vector(1 downto 0);
+        U_address : in    std_logic_vector(18 downto 0);
         Reset     : in    std_logic;
         Clock     : in    std_logic;
         ---------------
@@ -160,7 +160,7 @@ begin
                 Oe_n <= '0';
                 Ce_n <= '1';
                 Ce2_n <= '0';
-                Ce2 <= '0';
+                Ce2 <= '1';
                 Zz <= '0';
             when S_IDLE =>
                 ------------------- S_IDLE  State -------------------
@@ -178,7 +178,7 @@ begin
                 Oe_n <= '0';
                 Ce_n <= '0';
                 Ce2_n <= '0';
-                Ce2 <= '0';
+                Ce2 <= '1';
                 Zz <= '1';  -- In idle mode, using snooze allows for a quicker wake-up cycle.
             when S_READ_SRAM_NO_BURST =>
                 ------------ S_READ_SRAM_NO_BURST  State ------------
@@ -197,7 +197,7 @@ begin
                 Oe_n <= '0';
                 Ce_n <= '0';
                 Ce2_n <= '0';
-                Ce2 <= '0';
+                Ce2 <= '1';
                 Zz <= '0';
             when S_WRITE_SRAM_NO_BURST =>
                 ------------ S_WRITE_SRAM_NO_BURST State ------------
@@ -216,7 +216,7 @@ begin
                 Oe_n <= '0';
                 Ce_n <= '0';
                 Ce2_n <= '0';
-                Ce2 <= '0';
+                Ce2 <= '1';
                 Zz <= '0';
         end case;
     end process;

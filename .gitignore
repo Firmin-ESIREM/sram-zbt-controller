@@ -87,6 +87,11 @@
 !*.bmm
 !*.xmp
 
+
+*.cache/
+*.runs/
+**/behav/xsim/
+
 # Internal project files
 !README.md
 !.gitattributes
