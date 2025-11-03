@@ -73,22 +73,22 @@ architecture Behavioral of tb1 is
             ---------------
         
             -- external SRAM side --
-            Data      : inout std_logic_vector (35 downto 0);  -- Data I/O
-            Address   : out   std_logic_vector (18 downto 0);  -- Address
-            Lbo_n     : out   std_logic;                       -- Burst Mode
-            Clk       : out   std_logic;                       -- Clk
-            Cke_n     : out   std_logic;                       -- Cke#
-            Ld_n      : out   std_logic;                       -- Adv/Ld#
-            Bwa_n     : out   std_logic;                       -- Bwa#
-            Bwb_n     : out   std_logic;                       -- BWb#
-            Bwc_n     : out   std_logic;                       -- Bwc#
-            Bwd_n     : out   std_logic;                       -- BWd#
-            Rw_n      : out   std_logic;                       -- RW#
-            Oe_n      : out   std_logic;                       -- OE#
-            Ce_n      : out   std_logic;                       -- CE#
-            Ce2_n     : out   std_logic;                       -- CE2#
-            Ce2       : out   std_logic;                       -- CE2
-            Zz        : out   std_logic                        -- Snooze Mode
+            c_Data    : inout std_logic_vector (35 downto 0);  -- Data I/O
+            c_Address : out   std_logic_vector (18 downto 0);  -- Address
+            c_Lbo_n   : out   std_logic;                       -- Burst Mode
+            c_Clk     : out   std_logic;                       -- Clk
+            c_Cke_n   : out   std_logic;                       -- Cke#
+            c_Ld_n    : out   std_logic;                       -- Adv/Ld#
+            c_Bwa_n   : out   std_logic;                       -- Bwa#
+            c_Bwb_n   : out   std_logic;                       -- BWb#
+            c_Bwc_n   : out   std_logic;                       -- Bwc#
+            c_Bwd_n   : out   std_logic;                       -- BWd#
+            c_Rw_n    : out   std_logic;                       -- RW#
+            c_Oe_n    : out   std_logic;                       -- OE#
+            c_Ce_n    : out   std_logic;                       -- CE#
+            c_Ce2_n   : out   std_logic;                       -- CE2#
+            c_Ce2     : out   std_logic;                       -- CE2
+            c_Zz      : out   std_logic                        -- Snooze Mode
             ------------------------
         );
 
@@ -96,8 +96,82 @@ architecture Behavioral of tb1 is
 
     constant clock_period: time := 10 ns;
     signal clock_init: STD_LOGIC;
+    
+    signal s_U_data_i  : std_logic_vector(35 downto 0);
+    signal s_U_data_o  : std_logic_vector(35 downto 0);
+    signal s_Read      : std_logic;
+    signal s_Write     : std_logic;
+    signal s_U_address : std_logic_vector(1 downto 0);
+    signal s_Reset     : std_logic;
+    signal s_Clock     : std_logic;
+    
+    signal s_Data    : std_logic_vector (35 downto 0);  -- Data I/O
+    signal s_Address : std_logic_vector (18 downto 0);  -- Address
+    signal s_Lbo_n   : std_logic;                       -- Burst Mode
+    signal s_Clk     : std_logic;                       -- Clk
+    signal s_Cke_n   : std_logic;                       -- Cke#
+    signal s_Ld_n    : std_logic;                       -- Adv/Ld#
+    signal s_Bwa_n   : std_logic;                       -- Bwa#
+    signal s_Bwb_n   : std_logic;                       -- BWb#
+    signal s_Bwc_n   : std_logic;                       -- Bwc#
+    signal s_Bwd_n   : std_logic;                       -- BWd#
+    signal s_Rw_n    : std_logic;                       -- RW#
+    signal s_Oe_n    : std_logic;                       -- OE#
+    signal s_Ce_n    : std_logic;                       -- CE#
+    signal s_Ce2_n   : std_logic;                       -- CE2#
+    signal s_Ce2     : std_logic;                       -- CE2
+    signal s_Zz      : std_logic;                       -- Snooze Mode
+
 
     begin
+    
+    controller_port_map: controller
+        port map (
+            U_data_i  => s_U_data_i,
+            U_data_o  => s_U_data_o,
+            Read      => s_Read,
+            Write     => s_Write,
+            U_address => s_U_address,
+            Reset     => s_Reset,
+            Clock     => s_Clock,
+                    
+            c_Data    => s_Data,
+            c_Address => s_Address,
+            c_Lbo_n   => s_Lbo_n,
+            c_Clk     => s_Clk,
+            c_Cke_n   => s_Cke_n,
+            c_Ld_n    => s_Ld_n,
+            c_Bwa_n   => s_Bwa_n,
+            c_Bwb_n   => s_Bwb_n,
+            c_Bwc_n   => s_Bwc_n,
+            c_Bwd_n   => s_Bwd_n,
+            c_Rw_n    => s_Rw_n,
+            c_Oe_n    => s_Oe_n,
+            c_Ce_n    => s_Ce_n,
+            c_Ce2_n   => s_Ce2_n,
+            c_Ce2     => s_Ce2,
+            c_Zz      => s_Zz
+        );
+        
+    mt55l512y36f_port_map: mt55l512y36f
+        port map (
+            Dq      => s_Data,
+            Addr    => s_Address,
+            Lbo_n   => s_Lbo_n,
+            Clk     => s_Clk,
+            Cke_n   => s_Cke_n,
+            Ld_n    => s_Ld_n,
+            Bwa_n   => s_Bwa_n,
+            Bwb_n   => s_Bwb_n,
+            Bwc_n   => s_Bwc_n,
+            Bwd_n   => s_Bwd_n,
+            Rw_n    => s_Rw_n,
+            Oe_n    => s_Oe_n,
+            Ce_n    => s_Ce_n,
+            Ce2_n   => s_Ce2_n,
+            Ce2     => s_Ce2,
+            Zz      => s_Zz
+        );
 
 
 end Behavioral;
