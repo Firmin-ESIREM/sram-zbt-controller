@@ -79,6 +79,7 @@ architecture Behavioral of controller is
     end component;
 
     type t_state is (S_RESET, S_IDLE, S_READ_SRAM_NO_BURST, S_WRITE_SRAM_NO_BURST);
+    
     signal state: t_state;
     signal inout_mode: std_logic;  -- '0' = in mode // '1' = out mode
 
