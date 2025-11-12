@@ -108,7 +108,7 @@ begin
         if (Reset = '1') then
             state <= S_RESET;
         else
-            if ((clock'event) and (clock = '1')) then
+            if ((clock'event) and (clock = '0')) then
                 case state is
                     when S_RESET =>
                         state <= S_IDLE;
@@ -180,7 +180,7 @@ begin
                 Ce_n <= '0';
                 Ce2_n <= '0';
                 Ce2 <= '1';
-                Zz <= '1';  -- In idle mode, using snooze allows for a quicker wake-up cycle.
+                Zz <= '1';  -- In idle mode, using snooze mode allows for a quicker wake-up cycle.
             when S_READ_SRAM_NO_BURST =>
                 ------------ S_READ_SRAM_NO_BURST  State ------------
                 -- In this state, the chip is in "read" mode, and  --

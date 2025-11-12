@@ -186,32 +186,37 @@ architecture Behavioral of tb1 is
     
     stimulus: process
     begin
+        clock_init <= '1';
         s_Reset <= '1';
         wait for 50 ns;
+        
+        wait until (s_Clock'event and S_clock = '1');
+        wait for clock_period/4;
     
         s_U_data_i <= x"ABCDE1234";
         s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
         s_Read <= '0';
         s_Reset <= '0';
         
-        clock_init <= '1';
         
         wait for 10 * clock_period;
         
+        wait until (s_Clock'event and S_clock = '1');
+        wait for clock_period/4;
         
         s_Write <= '1';
         
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
         
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_Write <= '0';
         s_Read <= '1';
@@ -220,14 +225,14 @@ architecture Behavioral of tb1 is
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
         
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
         s_U_data_i <= x"001ACE42E";
@@ -237,14 +242,14 @@ architecture Behavioral of tb1 is
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
         
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_Write <= '0';
         s_Read <= '1';
@@ -253,14 +258,14 @@ architecture Behavioral of tb1 is
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
       
         wait for 2 * clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
-        wait for 2 ns;
+        wait for clock_period/4;
         
         clock_init <= '0';
         s_Reset <= '1';
