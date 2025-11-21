@@ -39,6 +39,7 @@ entity controller is
         U_data_o  : out   std_logic_vector(35 downto 0);
         Read      : in    std_logic;
         Write     : in    std_logic;
+        Burst     : in    std_logic;
         U_address : in    std_logic_vector(18 downto 0);
         Reset     : in    std_logic;
         Clock     : in    std_logic;
@@ -91,7 +92,7 @@ architecture Behavioral of controller is
         );
     end component;
 
-    type t_state is (S_RESET, S_IDLE, S_READ_SRAM_NO_BURST, S_WRITE_SRAM_NO_BURST);
+    type t_state is (S_RESET, S_IDLE, S_READ_SRAM_NO_BURST, S_WRITE_SRAM_NO_BURST, S_READ_SRAM_BURST, S_WRITE_SRAM_BURST);
     
     signal state: t_state;
     signal inout_mode: std_logic;  -- '0' = in mode // '1' = out mode
@@ -160,19 +161,27 @@ begin
                         else
                             state <= S_IDLE;
                         end if;
-                    when S_READ_SRAM_NO_BURST =>
+                    when S_READ_SRAM_NO_BURST | S_READ_SRAM_BURST =>
                         if (Read = '1') then
-                            state <= S_READ_SRAM_NO_BURST;
+                            if (Burst = '1') then
+                                state <= S_READ_SRAM_BURST;
+                            else
+                                state <= S_READ_SRAM_NO_BURST;
+                            end if;
                         elsif (Write = '1') then
                             state <= S_WRITE_SRAM_NO_BURST;
                         else
                             state <= S_IDLE;
                         end if;
-                    when S_WRITE_SRAM_NO_BURST =>
+                    when S_WRITE_SRAM_NO_BURST | S_WRITE_SRAM_BURST =>
                         if (Read = '1') then
                             state <= S_READ_SRAM_NO_BURST;
                         elsif (Write = '1') then
-                            state <= S_WRITE_SRAM_NO_BURST;
+                            if (Burst = '1') then
+                                state <= S_WRITE_SRAM_BURST;
+                            else
+                                state <= S_WRITE_SRAM_NO_BURST;
+                            end if;
                         else
                             state <= S_IDLE;
                         end if;
@@ -226,7 +235,7 @@ begin
             when S_READ_SRAM_NO_BURST =>
                 ------------ S_READ_SRAM_NO_BURST  State ------------
                 -- In this state, the chip is in "read" mode, and  --
-                -- the IO buffer is set to out mode.               --
+                -- the IO buffer is set to "out" mode.               --
                 -----------------------------------------------------
                 inout_mode <= '1';
                 enable_iob <= '1';
@@ -253,6 +262,48 @@ begin
                 Lbo_n <= '0';
                 Cke_n <= '0';
                 Ld_n <= '0';
+                Bwa_n <= '0';
+                Bwb_n <= '0';
+                Bwc_n <= '0';
+                Bwd_n <= '0';
+                Rw_n <= '0';
+                Oe_n <= '0';
+                Ce_n <= '0';
+                Ce2_n <= '0';
+                Ce2 <= '1';
+                Zz <= '0';
+            when S_READ_SRAM_BURST =>
+                -------------- S_READ_SRAM_BURST State --------------
+                -- In this state, the chip is in "write" mode, the --
+                -- IO buffer is set to "in" mode, and the address  --
+                -- increments automatically.                       --
+                -----------------------------------------------------
+                inout_mode <= '1';
+                enable_iob <= '1';
+                Lbo_n <= '0';
+                Cke_n <= '0';
+                Ld_n <= '1';
+                Bwa_n <= '0';
+                Bwb_n <= '0';
+                Bwc_n <= '0';
+                Bwd_n <= '0';
+                Rw_n <= '1';
+                Oe_n <= '0';
+                Ce_n <= '0';
+                Ce2_n <= '0';
+                Ce2 <= '1';
+                Zz <= '0';
+            when S_WRITE_SRAM_BURST =>
+                ------------- S_WRITE_SRAM_BURST  State -------------
+                -- In this state, the chip is in "read" mode, the --
+                -- IO buffer is set to "out" mode, and the address --
+                -- increments automatically.                       --
+                -----------------------------------------------------
+                inout_mode <= '0';
+                enable_iob <= '1';
+                Lbo_n <= '0';
+                Cke_n <= '0';
+                Ld_n <= '1';
                 Bwa_n <= '0';
                 Bwb_n <= '0';
                 Bwc_n <= '0';

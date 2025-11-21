@@ -68,6 +68,7 @@ architecture Behavioral of tb1 is
             U_data_o  : out   std_logic_vector(35 downto 0);
             Read      : in    std_logic;
             Write     : in    std_logic;
+            Burst     : in    std_logic;
             U_address : in    std_logic_vector(18 downto 0);
             Reset     : in    std_logic;
             Clock     : in    std_logic;
@@ -102,6 +103,7 @@ architecture Behavioral of tb1 is
     signal s_U_data_o  : std_logic_vector(35 downto 0);
     signal s_Read      : std_logic;
     signal s_Write     : std_logic;
+    signal s_Burst     : std_logic;
     signal s_U_address : std_logic_vector(18 downto 0);
     signal s_Reset     : std_logic;
     signal s_Clock     : std_logic;
@@ -132,6 +134,7 @@ architecture Behavioral of tb1 is
             U_data_o  => s_U_data_o,
             Read      => s_Read,
             Write     => s_Write,
+            Burst     => s_Burst,
             U_address => s_U_address,
             Reset     => s_Reset,
             Clock     => s_Clock,
@@ -197,6 +200,7 @@ architecture Behavioral of tb1 is
         s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
         s_Read <= '0';
         s_Write <= '0';
+        s_Burst <= '0';
         s_Reset <= '0';
         
         
@@ -239,15 +243,17 @@ architecture Behavioral of tb1 is
         s_U_data_i <= x"001ACE42E";
         s_Read <= '0';
         s_Write <= '1';
+        s_Burst <= '1';
+        wait for clock_period;
         
-        wait for 2 * clock_period;
+        s_U_data_i <= x"001ACE42D";
+        wait for clock_period;
         
-        wait until (s_Clock'event and S_clock = '1');
-        wait for clock_period/4;
+        s_U_data_i <= x"001ACE42C";
+        wait for clock_period;
         
-        s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
-        
-        wait for 2 * clock_period;
+        s_U_data_i <= x"001ACE42B";
+        wait for clock_period;
         
         wait until (s_Clock'event and S_clock = '1');
         wait for clock_period/4;
@@ -256,15 +262,8 @@ architecture Behavioral of tb1 is
         s_Read <= '1';
         s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
         
-        wait for 2 * clock_period;
-        
-        wait until (s_Clock'event and S_clock = '1');
-        wait for clock_period/4;
-        
-        s_U_address <= std_logic_vector(to_unsigned(16#5F21A#, 19));
-      
-        wait for 2 * clock_period;
-        
+        wait for 4 * clock_period;
+             
         wait until (s_Clock'event and S_clock = '1');
         wait for clock_period/4;
         
