@@ -77,11 +77,27 @@ architecture Behavioral of controller is
             ENTREE      : in    std_logic
         );
     end component;
+    
+    component d_latch
+        generic (
+            bus_width : integer := 8
+        );
+        Port (
+            D     : in std_logic_vector (bus_width - 1 downto 0);
+            Q     : out std_logic_vector (bus_width - 1 downto 0);
+            CLK   : in std_logic;
+            EN    : in std_logic;
+            RESET : in std_logic
+        );
+    end component;
 
     type t_state is (S_RESET, S_IDLE, S_READ_SRAM_NO_BURST, S_WRITE_SRAM_NO_BURST);
     
     signal state: t_state;
     signal inout_mode: std_logic;  -- '0' = in mode // '1' = out mode
+    signal inout_mode_1: std_logic;  -- inout_mode shifted by one clock cycle
+    signal enable_iob: std_logic;
+    signal U_data_i_1: std_logic_vector(35 downto 0);  -- U_data_i shifted by one clock cycle
 
 begin
 
@@ -92,11 +108,35 @@ begin
                     SORTIE => U_data_o(i),
                     CLK    => Clock,
                     nRESET => Reset,
-                    TRIG   => inout_mode,
+                    TRIG   => inout_mode_1,
                     E_S    => Data(i),
-                    ENTREE => U_data_i(i)
+                    ENTREE => U_data_i_1(i)
                 );
     end generate io_buffers;
+    
+    inout_mode_latch: d_latch
+        generic map (
+            bus_width => 1
+        )
+        port map (
+            D(0)  => inout_mode,
+            Q(0)  => inout_mode_1,
+            CLK   => Clock,
+            EN    => enable_iob,
+            RESET => Reset
+        );
+    
+    U_data_i_latch: d_latch
+        generic map (
+            bus_width => 36
+        )
+        port map (
+            D     => U_data_i,
+            Q     => U_data_i_1,
+            CLK   => Clock,
+            EN    => enable_iob and not(inout_mode),
+            RESET => Reset
+        );
 
     -- Hardwiring --
     Clk <= Clock;
@@ -150,6 +190,7 @@ begin
                 -- In this state, the chip is completely disabled. --
                 -----------------------------------------------------
                 inout_mode <= '0';
+                enable_iob <= '0';
                 Lbo_n <= '0';
                 Cke_n <= '0';
                 Ld_n <= '0';
@@ -168,6 +209,7 @@ begin
                 -- In this state, the chip is in light sleep mode. --
                 -----------------------------------------------------
                 inout_mode <= '0';
+                enable_iob <= '0';
                 Lbo_n <= '0';
                 Cke_n <= '0';
                 Ld_n <= '0';
@@ -187,6 +229,7 @@ begin
                 -- the IO buffer is set to out mode.               --
                 -----------------------------------------------------
                 inout_mode <= '1';
+                enable_iob <= '1';
                 Lbo_n <= '0';
                 Cke_n <= '0';
                 Ld_n <= '0';
@@ -206,6 +249,7 @@ begin
                 -- the IO buffer is set to "in" mode.              --
                 -----------------------------------------------------
                 inout_mode <= '0';
+                enable_iob <= '1';
                 Lbo_n <= '0';
                 Cke_n <= '0';
                 Ld_n <= '0';

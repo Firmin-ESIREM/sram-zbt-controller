@@ -196,6 +196,7 @@ architecture Behavioral of tb1 is
         s_U_data_i <= x"ABCDE1234";
         s_U_address <= std_logic_vector(to_unsigned(16#6A93C#, 19));
         s_Read <= '0';
+        s_Write <= '0';
         s_Reset <= '0';
         
         
