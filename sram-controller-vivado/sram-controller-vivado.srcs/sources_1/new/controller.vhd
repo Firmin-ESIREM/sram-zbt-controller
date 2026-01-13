@@ -235,7 +235,7 @@ begin
             when S_READ_SRAM_NO_BURST =>
                 ------------ S_READ_SRAM_NO_BURST  State ------------
                 -- In this state, the chip is in "read" mode, and  --
-                -- the IO buffer is set to "out" mode.               --
+                -- the IO buffer is set to "out" mode.             --
                 -----------------------------------------------------
                 inout_mode <= '1';
                 enable_iob <= '1';
@@ -295,7 +295,7 @@ begin
                 Zz <= '0';
             when S_WRITE_SRAM_BURST =>
                 ------------- S_WRITE_SRAM_BURST  State -------------
-                -- In this state, the chip is in "read" mode, the --
+                -- In this state, the chip is in "read" mode, the  --
                 -- IO buffer is set to "out" mode, and the address --
                 -- increments automatically.                       --
                 -----------------------------------------------------
